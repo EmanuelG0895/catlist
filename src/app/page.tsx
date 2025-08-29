@@ -1,27 +1,23 @@
 "use client";
-import useFetchCats from "@/hooks/GetCatList";
-import UserCard from "./components/UserCard";
-import useFetchUsers from "@/hooks/GetRandomUser";
 
-function Page() {
-  const gatos = useFetchCats();
-  const users = useFetchUsers();
-  console.log(users);
+import { CatFactsList } from "@/components/cat-facts-list";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 2,
+    },
+  },
+});
+
+export default function UserCard() {
   return (
-    <div className="space-y-5 container mx-auto">
-      {gatos.map((contentCat, index) => {
-        return (
-          <UserCard
-            key={index}
-            description={contentCat.fact}
-            userImage="/file.svg"
-            userName="usuario"
-          />
-        );
-      })}
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div className="bg-gray-200">
+        <CatFactsList />
+      </div>
+    </QueryClientProvider>
   );
 }
-
-export default Page;
