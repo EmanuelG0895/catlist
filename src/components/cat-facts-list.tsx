@@ -1,8 +1,10 @@
 "use client";
 
-import { useCombinedCatFactsAndUsers } from "@/hooks/useCombinedCatAndUsers";
 import { useRef, useCallback } from "react";
+import { RefreshCw } from "lucide-react";
+import { useCombinedCatFactsAndUsers } from "@/hooks/useCombinedCatAndUsers";
 import Skeleton from "./ui/skeleton";
+import { Alert } from "./ui/alert";
 import { CatFactCard } from "./UserCard";
 
 export function CatFactsList() {
@@ -18,7 +20,6 @@ export function CatFactsList() {
   } = useCombinedCatFactsAndUsers();
 
   const observerRef = useRef<IntersectionObserver | null>(null);
-
   const lastElementRef = useCallback(
     (node: HTMLDivElement) => {
       if (isFetchingNextPage) return;
@@ -44,7 +45,20 @@ export function CatFactsList() {
   }
 
   if (isError) {
-    return <div className="max-w-2xl mx-auto"></div>;
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Alert variant="destructive">
+          <span>
+            Failed to load cat facts:{" "}
+            {error instanceof Error ? error.message : "Unknown error"}
+          </span>
+          <button onClick={() => refetch()} className="ml-4">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Retry
+          </button>
+        </Alert>
+      </div>
+    );
   }
 
   const allItems = data?.pages.flatMap((page) => page.data) ?? [];
